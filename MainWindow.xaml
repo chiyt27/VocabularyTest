@@ -15,13 +15,36 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30" />
                     <ColumnDefinition Width="3*" />
                     <ColumnDefinition Width="5*" />
                     <ColumnDefinition Width="30" />
                 </Grid.ColumnDefinitions>
-                <Label x:Name="Word" Grid.Column="0" FontWeight="Bold" Content="Word" FontSize="14" Padding="5,0,0,5" />
-                <Label x:Name="Mean" Grid.Column="1" FontWeight="Bold" Content="Mean" FontSize="14" Padding="5,0"/>
-                <Button x:Name="ExitBtn" Grid.Column="2" Content="X"  Click="ExitBtn_Click" Background="{x:Null}" Width="16" Height="16" FontWeight="ExtraBold" Foreground="#FFF9F8F8">
+
+
+                <Button x:Name="SpeechBtn" Grid.Column="0" Click="Speak_Click" Background="{x:Null}" Width="16" Height="16" FontWeight="ExtraBold" Foreground="#FFF9F8F8">
+                    <Button.Template >
+                        <ControlTemplate TargetType="Button" >
+                            <Grid >
+                                <Path Stretch="Uniform" UseLayoutRounding="False" Fill="Green">
+                                    <Path.Data>
+                                        <EllipseGeometry RadiusX="1" RadiusY="1"/>
+
+                                    </Path.Data>
+                                </Path>
+                                <Polygon Points="5,3 13,8 5,13">
+                                    <Polygon.Fill>
+                                        <SolidColorBrush Color="White" Opacity="1"/>
+                                    </Polygon.Fill>
+                                </Polygon>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <Label x:Name="Word" Grid.Column="1" FontWeight="Bold" Content="Word" FontSize="14" Padding="5,0,0,5" />
+                <Label x:Name="Mean" Grid.Column="2" FontWeight="Bold" Content="Mean" FontSize="14" Padding="5,0"/>
+                <Button x:Name="ExitBtn" Grid.Column="3" Content="X"  Click="ExitBtn_Click" Background="{x:Null}" Width="16" Height="16" FontWeight="ExtraBold" Foreground="#FFF9F8F8">
                     <Button.Template >
                         <ControlTemplate TargetType="Button" >
                             <Grid >

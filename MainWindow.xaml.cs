@@ -6,17 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-
-//----
-//using System.Collections;
-//using System.Collections.ObjectModel;
-//using System.Configuration;
-//using System.Data;
-//using System.Diagnostics;
-//using System.Reflection;
-//using System.Windows.Data;
-//using System.Windows.Input;
-//using System.Windows.Media;
+using System.Speech.Synthesis;
 
 namespace WordTest
 {
@@ -27,6 +17,7 @@ namespace WordTest
     {
         int count = Properties.Settings.Default.Count; /*批次取的數量*/
         string wordFile = Properties.Settings.Default.WordFile; /*檔案位置*/
+        int speakRate = Properties.Settings.Default.SpeakRate; /*讀速*/
         int currentIdx = 0;
         List<WordInfo> DataList = new List<WordInfo>();
         List<WordInfo> resultList = new List<WordInfo>();
@@ -52,34 +43,56 @@ namespace WordTest
         #region  元件 Event or Method
         private void Btn_Click(object sender, RoutedEventArgs e)
         {
-            btnGrid.IsEnabled = false;
-            WordInfo current = resultList[currentIdx];
-            SetValue(current.Word, current.Mean);
-
-            string senderName = ((Button)sender).Name;
-            if (senderName == KnowBtn.Name)
+            try
             {
-                knowCnt++;
-                KnowBtn.Content = string.Format("{0} ({1})", knowBtnName, knowCnt);
-                if (DataList[current.Key].Weight > 1)
-                    DataList[current.Key].Weight--;
-            }
-            else if (senderName == UnKnowBtn.Name)
-            {
-                nnKnowCnt++;
-                UnKnowBtn.Content = string.Format("{0} ({1})", unknowBtnName, nnKnowCnt);
-                DataList[current.Key].Weight++;
-            }
+                btnGrid.IsEnabled = false;
+                WordInfo current = resultList[currentIdx];
+                SetValue(current.Word, current.Mean);
+
+                string senderName = ((Button)sender).Name;
+                if (senderName == KnowBtn.Name)
+                {
+                    knowCnt++;
+                    KnowBtn.Content = string.Format("{0} ({1})", knowBtnName, knowCnt);
+                    if (DataList[current.Key].Weight > 1)
+                        DataList[current.Key].Weight--;
+                }
+                else if (senderName == UnKnowBtn.Name)
+                {
+                    nnKnowCnt++;
+                    UnKnowBtn.Content = string.Format("{0} ({1})", unknowBtnName, nnKnowCnt);
+                    DataList[current.Key].Weight++;
+                }
 
 
-            Task.Factory.StartNew(() =>
-            {
-                System.Threading.Thread.Sleep(2000);
-                Dispatcher.Invoke((Action)delegate {
-                    GetNextOrNewAry();
-                    btnGrid.IsEnabled = true;
+                Task.Factory.StartNew(() =>
+                {
+                    System.Threading.Thread.Sleep(2000);
+                    Dispatcher.Invoke((Action)delegate {
+                        GetNextOrNewAry();
+                        btnGrid.IsEnabled = true;
+                    });
                 });
-            });
+            }
+            catch (Exception ex)
+            {
+                AlertMessage(ex.Message);
+            }
+        }
+
+        private void Speak_Click(object sender, RoutedEventArgs e)
+        {
+            //ref: https://code.msdn.microsoft.com/windowsdesktop/Text-to-Speech-Converter-0ed77dd5
+            try
+            {
+                SpeechSynthesizer reader = new SpeechSynthesizer();
+                reader.Rate = speakRate;
+                reader.SpeakAsync(Word.Content.ToString());
+            }
+            catch (Exception ex)
+            {
+                AlertMessage(ex.Message);
+            }
         }
 
         private void ExitBtn_Click(object sender, RoutedEventArgs e)
@@ -106,16 +119,28 @@ namespace WordTest
         #region 取值 Method
         private void GetNextOrNewAry()
         {
-            if (DataList.Count <= 0) return;
-
-            currentIdx++;
-            if (resultList.Count <= 0 || currentIdx >= resultList.Count)
+            try
             {
-                /*跑完一批後，取新的下一批 或 do other things*/
-                resultList = PickByWeight(DataList, count);
-                currentIdx = 0;
+                if (DataList.Count <= 0) return;
+
+                currentIdx++;
+                if (resultList.Count <= 0)
+                {
+                    /*跑完一批後，取新的下一批 或 do other things*/
+                    resultList = PickByWeight(DataList, count);
+                    currentIdx = 0;
+                }
+                else if (currentIdx >= resultList.Count)
+                {
+                    this.Close();
+                    return;
+                }
+                SetValue(resultList[currentIdx].Word, "");
             }
-            SetValue(resultList[currentIdx].Word, "");
+            catch (Exception ex)
+            {
+                AlertMessage(ex.Message);
+            }
         }
 
         private int GetTotalWeight(List<WordInfo> _dataList)
@@ -187,6 +212,7 @@ namespace WordTest
             catch (Exception ex)
             {
                 dataList = new List<WordInfo>();
+                AlertMessage(ex.Message);
             }
             finally
             {
@@ -224,16 +250,22 @@ namespace WordTest
         }
         #endregion 讀寫檔
 
-        class WordInfo
+        private void AlertMessage(string str)
         {
-            public int Key { get; set; }
-            public int Idx { get; set; }
-            public string Word { get; set; }
-            public int Weight { get; set; }
-            public string Mean { get; set; }
-
+            MessageBox.Show(str);
         }
-        
 
+
+        class WordInfo
+            {
+                public int Key { get; set; }
+                public int Idx { get; set; }
+                public string Word { get; set; }
+                public int Weight { get; set; }
+                public string Mean { get; set; }
+
+            }
+
+        
     }
 }
