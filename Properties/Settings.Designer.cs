@@ -40,5 +40,14 @@ namespace WordTest.Properties {
                 return ((int)(this["Count"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-3")]
+        public int SpeakRate {
+            get {
+                return ((int)(this["SpeakRate"]));
+            }
+        }
     }
 }

@@ -7,6 +7,16 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
+//----
+//using System.Collections;
+//using System.Collections.ObjectModel;
+//using System.Configuration;
+//using System.Data;
+//using System.Diagnostics;
+//using System.Reflection;
+//using System.Windows.Data;
+//using System.Windows.Input;
+//using System.Windows.Media;
 
 namespace WordTest
 {
@@ -17,6 +27,7 @@ namespace WordTest
     {
         int count = Properties.Settings.Default.Count; /*批次取的數量*/
         string wordFile = Properties.Settings.Default.WordFile; /*檔案位置*/
+        int speakRate = Properties.Settings.Default.SpeakRate; /*讀速*/
         int currentIdx = 0;
         List<WordInfo> DataList = new List<WordInfo>();
         List<WordInfo> resultList = new List<WordInfo>();
@@ -64,19 +75,14 @@ namespace WordTest
                 }
 
 
-                Task.Factory.StartNew(() =>
-                {
-                    System.Threading.Thread.Sleep(2000);
-                    Dispatcher.Invoke((Action)delegate {
-                        GetNextOrNewAry();
-                        btnGrid.IsEnabled = true;
-                    });
-                });
-            }
-            catch (Exception ex)
+            Task.Factory.StartNew(() =>
             {
-                AlertMessage(ex.Message);
-            }
+                System.Threading.Thread.Sleep(2000);
+                Dispatcher.Invoke((Action)delegate {
+                    GetNextOrNewAry();
+                    btnGrid.IsEnabled = true;
+                });
+            });
         }
 
         private void ExitBtn_Click(object sender, RoutedEventArgs e)
@@ -233,11 +239,6 @@ namespace WordTest
             }
         }
         #endregion 讀寫檔
-
-        private void AlertMessage(string str)
-        {
-            MessageBox.Show(str);
-        }
 
         class WordInfo
             {
